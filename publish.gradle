@@ -1,0 +1,30 @@
+apply plugin: 'maven-publish'
+
+def version = System.getenv("VERSION")
+
+if (version == null) {
+    throw new org.gradle.api.tasks.StopExecutionException("VERSION environment variable is not set")
+}
+
+publish.dependsOn jar
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            from components.java
+            groupId = 'com.github.sasaplus1-prototype'
+            artifactId = 'assets-only-jar'
+            version = version
+        }
+    }
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri("https://maven.pkg.github.com/sasaplus1-prototype/assets-only-jar")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+}
