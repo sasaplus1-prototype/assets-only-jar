@@ -18,3 +18,5 @@ jobs:
       - run: mv gradle* /opt
       - run: echo "/opt/gradle/bin" >> "$GITHUB_PATH"
       - run: gradle --help
+      - run: gradle wrapper
+      - run: ./gradlew --help
