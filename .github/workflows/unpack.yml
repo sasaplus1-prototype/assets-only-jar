@@ -42,7 +42,12 @@ jobs:
           }
 
           task unpack(type: Copy) {
-              from(zipTree(configurations.compileClasspath.singleFile))
+              from(zipTree(configurations.compileClasspath.singleFile)) {
+                  exclude 'META-INF/**'
+                  include '**/*.html'
+                  include '**/*.css'
+                  include '**/*.js'
+              }
               into 'destDir'
           }
           EOB
