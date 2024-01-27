@@ -47,6 +47,9 @@ jobs:
           }
           EOB
       - run: gradle wrapper
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: ./gradlew unpack
         env:
           USERNAME: ${{ github.actor }}
