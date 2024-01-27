@@ -1,0 +1,50 @@
+name: unpack
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: version
+        required: true
+
+jobs:
+  unpack:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+      - run: curl -fsSL 'https://services.gradle.org/distributions/gradle-8.5-bin.zip' -o 'gradle.zip'
+      - run: unzip gradle.zip
+      - run: mv gradle* /opt
+      - run: echo "/opt/gradle/bin" >> "$GITHUB_PATH"
+      - run: gradle --help
+      - run: |
+          cat <<'EOB' > build.gradle
+          repositories {
+              maven {
+                  url = uri("https://maven.pkg.github.com/sasaplus1-prototype/assets-only-jar")
+                  credentials {
+                      username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                      password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                  }
+              }
+          }
+          
+          dependencies {
+              implementation 'com.github.sasaplus1-prototype:assets-only-jar:${{ github.event.inputs.version }}'
+          }
+
+          task unpack(type: Copy) {
+              from(zipTree(configurations.compileClasspath.singleFile))
+              into 'destDir'
+          }
+          EOB
+      - run: gradle wrapper
+      - run: ./gradlew unpack
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: ls -lR
