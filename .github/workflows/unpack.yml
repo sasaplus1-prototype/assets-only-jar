@@ -47,8 +47,16 @@ jobs:
                   include '**/*.html'
                   include '**/*.css'
                   include '**/*.js'
+                  // include 'subdirectory/**/*.html'
+                  // include 'subdirectory/**/*.css'
+                  // include 'subdirectory/**/*.js'
               }
               into 'destDir'
+              // flatten copy
+              // eachFile { fcp ->
+              //     fcp.relativePath = new RelativePath(true, 'hoge', 'fuga', 'fugafuga', fcp.relativePath.segments)
+              // }
+              // includeEmptyDirs = false
           }
           EOB
       - run: gradle wrapper
@@ -60,3 +68,7 @@ jobs:
           USERNAME: ${{ github.actor }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: ls -lR
+      - run: sudo apt-get --yes update && sudo apt-get --yes install tree
+        env:
+          DEBIAN_FRONTEND: noninteractive
+      - run: tree
